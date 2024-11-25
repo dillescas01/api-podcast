@@ -1,0 +1,113 @@
+org: dillescas
+service: api-podcasts
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  memorySize: 512
+  timeout: 30
+  iam:
+    role: arn:aws:iam::940376243370:role/LabRole
+  environment:
+    TABLE_NAME: ${sls:stage}-t_podcasts
+
+functions:
+  post_podcast:
+    handler: lambda_post_podcast.handler
+    events:
+      - http:
+          path: /podcasts/create
+          method: post
+          cors: true
+          integration: lambda
+    package:
+      include:
+        - node_modules/uuid/**
+      exclude:
+        - node_modules/**
+        - '!node_modules/uuid/**'
+
+  get_all_podcasts:
+    handler: lambda_get_all_podcasts.handler
+    events:
+      - http:
+          path: /podcasts/
+          method: get
+          cors: true
+          integration: lambda
+
+  get_podcast_by_genre:
+    handler: lambda_get_podcast_by_genre.handler
+    events:
+      - http:
+          path: /podcasts/genre
+          method: post
+          cors: true
+          integration: lambda
+
+  get_podcast_by_creator_email:
+    handler: lambda_get_podcast_by_creator_email.handler
+    events:
+      - http:
+          path: /podcasts/creator
+          method: post
+          cors: true
+          integration: lambda
+
+  get_podcast_by_id:
+    handler: lambda_get_podcast_by_id.handler
+    events:
+      - http:
+          path: /podcasts/id
+          method: post
+          cors: true
+          integration: lambda
+
+  get_podcast_by_name:
+    handler: lambda_get_podcast_by_name.handler
+    events:
+      - http:
+          path: /podcasts/name
+          method: post
+          cors: true
+          integration: lambda
+
+resources:
+  Resources:
+    PodcastsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: creator_email
+            AttributeType: S
+          - AttributeName: genre#release_date
+            AttributeType: S
+          - AttributeName: podcast_uuid
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: creator_email
+            KeyType: HASH
+          - AttributeName: genre#release_date
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: podcast_uuid-index
+            KeySchema:
+              - AttributeName: podcast_uuid
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        LocalSecondaryIndexes:
+          - IndexName: name-index
+            KeySchema:
+              - AttributeName: creator_email
+                KeyType: HASH
+              - AttributeName: name
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true

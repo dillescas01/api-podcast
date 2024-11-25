@@ -1,0 +1,18 @@
+{
+    "name": "api-podcasts",
+    "version": "1.0.0",
+    "description": "Microservicio de podcasts",
+    "main": "lambda_post_podcast.mjs",
+    "scripts": {
+      "test": "echo \"Error: no hay pruebas definidas\" && exit 1"
+    },
+    "author": "Name",
+    "license": "ISC",
+    "dependencies": {
+      "@aws-sdk/client-dynamodb": "^3.426.0",
+      "@aws-sdk/lib-dynamodb": "^3.426.0",
+      "uuid": "^11.0.1"
+    },
+    "type": "module"
+  }
+  
