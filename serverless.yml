@@ -87,6 +87,8 @@ resources:
             AttributeType: S
           - AttributeName: name
             AttributeType: S
+          - AttributeName: genre
+            AttributeType: S  # Atributo necesario para el índice genre-index
         KeySchema:
           - AttributeName: creator_email
             KeyType: HASH
@@ -96,6 +98,12 @@ resources:
           - IndexName: podcast_uuid-index
             KeySchema:
               - AttributeName: podcast_uuid
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: genre-index  # Nuevo índice agregado
+            KeySchema:
+              - AttributeName: genre
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
